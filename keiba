@@ -1,0 +1,37 @@
+!pip install pymc3 lightbgm 
+
+import numpy as np
+import pandas as pd
+
+# LightGBM
+import lightgbm as lgb
+
+# PyMCによるベイズ線形回帰 (PyMC v3系を想定)
+# v4系(PyMC 4.x)では import pymc as pm になるので注意
+import pymc3 as pm
+
+# RMSE, MAE の計算
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+
+# =============== 1. データ読み込み ===============
+def load_data():
+    """
+    2022年データと2023年データを読み込んで返す。
+    必要に応じてファイルパスや読み込みオプションを調整してください。
+    """
+    df_2022 = pd.read_csv("new_keiba_data_2022.csv")
+    df_2023 = pd.read_csv("new_keiba_data_2023.csv")
+    
+    # 必要に応じて 'date' を datetime に変換 (parse_dates=["date"] など)
+    # df_2022['date'] = pd.to_datetime(df_2022['date'])
+    # df_2023['date'] = pd.to_datetime(df_2023['date'])
+    
+    # 使うカラムがそろっているかチェック（本番環境でご確認ください）
+    needed_cols = ['タイム', '斤量', '今回の体重', '体重変化', 'course_len', '馬の平均速度']
+    for c in needed_cols:
+        if c not in df_2022.columns:
+            raise ValueError(f"{c} が2022年データに存在しません。")
+        if c not in df_2023.columns:
+            raise ValueError(f"{c} が2023年データに存在しません。")
+
+    return df_2022, df_2023
